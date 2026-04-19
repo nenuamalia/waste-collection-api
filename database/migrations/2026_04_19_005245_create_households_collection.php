@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::connection('mongodb')->create('households', function (Blueprint $collection) {
+       Schema::connection('mongodb')->create('households', function (Blueprint $collection) {
             $collection->index('owner_name');
             $collection->index('block');
             $collection->index('no');
