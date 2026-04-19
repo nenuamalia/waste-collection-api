@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Factories\WasteFactory;
 use App\Models\Waste;
 
 class WasteRepository
@@ -25,20 +26,37 @@ class WasteRepository
 
     public function findById(string $id): ?Waste
     {
-        return Waste::find($id);
+        $waste = Waste::find($id);
+        if (!$waste) return null;
+
+        // Resolve to the correct subclass
+        return WasteFactory::resolve($waste);
     }
 
     public function create(array $data): Waste
     {
-        return Waste::create($data);
+        // Create the appropriate subclass instance, then save
+        $waste = WasteFactory::make($data['type'], $data);
+        $waste->save();
+        return $waste;
     }
 
     public function update(string $id, array $data): ?Waste
     {
-        $waste = $this->findById($id);
-        if ($waste) {
-            $waste->update($data);
-        }
-        return $waste;
+        $waste = Waste::find($id);
+        if (!$waste) return null;
+
+        $waste->update($data);
+
+        // Re-resolve after update
+        return WasteFactory::resolve($waste->fresh());
+    }
+
+    public function getPendingOrganicOlderThan(int $days): \Illuminate\Support\Collection
+    {
+        return Waste::where('type', 'organic')
+            ->where('status', 'pending')
+            ->where('created_at', '<', now()->subDays($days))
+            ->get();
     }
 }
