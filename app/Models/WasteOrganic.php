@@ -16,7 +16,7 @@ class WasteOrganic extends Waste
             return false;
         }
 
-        return now()->diffInDays($this->created_at) > 3
+        return $this->created_at->diffInDays(now()) > 3
             && $this->status === 'pending';
     }
 }
