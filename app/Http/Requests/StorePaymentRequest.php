@@ -24,6 +24,7 @@ class StorePaymentRequest extends FormRequest
     {
         return [
             'household_id' => 'required|string',
+            'waste_id'     => 'nullable|string',
             'amount'       => 'required|numeric|min:0',
         ];
     }
